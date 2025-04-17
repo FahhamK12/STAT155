@@ -7,3 +7,17 @@ Introduction: Exoplanet discovery is a relatively new field of science. As a res
 Hypothesis: Certain discovery methods will have an affect on what exoplanets they detect.
 
 Dataset: The dataset being used in NASA's exoplanet archive which gives data on all known exoplanetary systems. The data was collected through various missions and telescopes. Variables such as discovery method, planet name, and planet mass are given.
+
+Key Variables: 
+| Variable        | Description                         |
+|-----------------|-------------------------------------|
+| pl_name         | Planet name                         |
+| hostname        | Host star name                      |
+| discoverymethod | Method used to detect the exoplanet |
+| pl_orbper       | Orbital period (days)               |
+| pl_rade         | Planet radius (Earth radii)         |
+| pl_bmasse       | Planet mass (Earth masses)          |
+| st_teff         | Stellar effective temperature (K)   |
+| st_mass         | Stellar mass (Solar masses)         |
+| pl_orbsmax      | Semi-major axis (AU)                |
+| disc_year       | Year of discovery                   |
