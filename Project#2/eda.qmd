@@ -14,6 +14,16 @@ The exoplanet parameters that will be tested will be the equilibrium temperature
 
 ## EDA
 
+Univariate Analysis
+
+```{r}
+library(ggplot2)
+summary(planetdata_cleaned$discoverymethod)
+ggplot(planetdata_cleaned, aes(x=discoverymethod))+geom_bar()+theme(axis.text = element_text(size=6))
+```
+
+The visualization above shows the distribution of which discovery methods are more prevalent. As shown, transit and radial velocity make up the vast majority of exoplanet discoveries.
+
 Bivariate Analysis
 
 ```{r}
@@ -21,11 +31,18 @@ library(ggplot2)
 ggplot(planetdata_cleaned_transit, aes(x=discoverymethod, y =pl_orbper))+geom_point()+labs(x = "Transit", y = "Orbital Period")
 ```
 
-You can add options to executable code like this
+The above visualization shows the relation between planets discovered through transit and their orbital period. The majority of planets are between 0 and 1500 days with only one outlier at over 3500 days.
+
+Multivariate Analysis
 
 ```{r}
-#| echo: false
-2 * 2
+library(ggplot2)
+set.seed(123)
+data_numeric <- planetdata_cleaner[, sapply(planetdata_cleaner, is.numeric)]
+planetdata_cleanest <- data_numeric[complete.cases(data_numeric) & apply(data_numeric, 1, function(x) all(is.finite(x))), ]
+kcluster <- kmeans(planetdata_cleanest, centers = 2)
+planetdata_cleanest$cluster <- factor(kcluster$cluster)
+ggplot(planetdata_cleanest, aes(x = pl_massj, y=pl_rade, color-cluster))+geom_point()
 ```
 
 The `echo: false` option disables the printing of code (only output is displayed).
