@@ -36,13 +36,24 @@ The above visualization shows the relation between planets discovered through tr
 Multivariate Analysis
 
 ```{r}
+install.packages("ggplot2")
+install.packages("tidyr")
+install.packages("dplyr")
+library(dplyr)
 library(ggplot2)
-set.seed(123)
-data_numeric <- planetdata_cleaner[, sapply(planetdata_cleaner, is.numeric)]
-planetdata_cleanest <- data_numeric[complete.cases(data_numeric) & apply(data_numeric, 1, function(x) all(is.finite(x))), ]
-kcluster <- kmeans(planetdata_cleanest, centers = 2)
-planetdata_cleanest$cluster <- factor(kcluster$cluster)
-ggplot(planetdata_cleanest, aes(x = pl_massj, y=pl_rade, color-cluster))+geom_point()
+library(tidyr)
+filtered_data <- planetdata_cleaner %>%
+  filter(discoverymethod %in% c("Transit", "Radial Velocity")) %>%
+  select(pl_name, discoverymethod, pl_orbper) %>%
+  filter(!is.na(pl_orbper))
+ggplot(filtered_data, aes(x = pl_orbper, fill = discoverymethod)) +
+  geom_density(alpha = 0.5) +
+  scale_x_log10() +
+  labs(title = "Orbital Period Distribution by Discovery Method",
+       x = "Orbital Period (days, log scale)",
+       y = "Density",
+       fill = "Discovery Method") +
+  theme_minimal()
 ```
 
-The `echo: false` option disables the printing of code (only output is displayed).
+The above visualization shows a density graph of the orbital period comparing the radial velocity and transit. The graph shows that both have a peak around 25 days, suggesting that the exoplanet discovery methods favor a certain range of orbital periods. It should be noted that radial velocity has a larger range of days while transit's range is more focused.
