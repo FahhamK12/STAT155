@@ -35,33 +35,52 @@ ggplot(filtered_data, aes(x = pl_orbper, fill = discoverymethod)) +
 
 ## Methodology
 
-K-means clustering is the analysis that is currently being used as it serves to group together variables to find any patterns that might be present. In the code below, only two variables are being used to test k-means clustering. The final version will include a multitude of variables.
+K-means clustering is the analysis that is currently being used as it serves to group together variables to find any patterns that might be present. In the code below, the variables representing orbital period, semi major axis, planetary mass, and planetary radius are being used to test k-means clustering.
 
 ```{r}
 library(ggplot2)
 library(dplyr)
+library(datadictionary)
 url <- "https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=select+*+from+pscomppars&format=csv"
 planetdata <- read.csv(url) 
 glimpse(planetdata) 
 create_dictionary(planetdata)
 planetdata_edit <- select(planetdata, "pl_name", "hostname", "discoverymethod", "pl_orbper", "pl_orbsmax", "pl_massj", "pl_eqt", "pl_orbeccen", "pl_rade") 
 planetdata_cleaner <- na.omit(planetdata_edit)
-planetdata_final <- subset(planetdata_cleaner, discoverymethod %in% c("Transit", "Radial Velocity", "Micronlensing", "Imaging"))
+planetdata_final <- subset(planetdata_cleaner, discoverymethod %in% c("Transit", "Radial Velocity", "Microlensing", "Imaging"))
 planetdata_final$discoverymethod_label <- as.numeric(factor(planetdata_final$discoverymethod))
 planetdata_final |> select(pl_orbper, pl_orbsmax) |> cor(use = "pairwise.complete.obs") |> round(3)
-ggplot(planetdata_final, aes(pl_orbper, pl_orbsmax, color = discoverymethod, shape = discoverymethod)) + geom_point(alpha = 2, size =1.5) + scale_x_log10() + scale_y_log10() + xlab("Orbital Period") + ylab("Semi Major Axis")
-planetdata_final[,c("pl_orbper", "pl_orbsmax")] <- scale(planetdata_final[,c("pl_orbper", "pl_orbsmax")])
-kmeanscols <- planetdata_final[,c("pl_orbper", "pl_orbsmax")]
+ggplot(planetdata_final, aes(pl_orbper, pl_massj, color = discoverymethod, shape = discoverymethod)) + geom_point(alpha = 0.25, size =1.5) + scale_x_log10() + scale_y_log10() + xlab("Orbital Period") + ylab("Planet Mass")
+kmeanscols <- planetdata_final[,c("pl_orbper", "pl_massj")]
 set.seed(123)
-km.out <- kmeans(kmeanscols, centers = 3, nstart = 20)
+km.out <- kmeans(kmeanscols, centers = 4, nstart = 20)
 km.out
 planetdata_final$cluster_id <- factor(km.out$cluster)
-ggplot(planetdata_final, aes(x = pl_orbper, y = pl_orbsmax, color = cluster_id, shape = discoverymethod)) +
-  geom_point(alpha = 7, size =3) +
-  scale_x_log10() +
-  scale_y_log10() +
+ggplot(planetdata_final, aes(x = pl_orbper, y = pl_massj, color = cluster_id, shape = discoverymethod)) +
+  geom_point(alpha = 0.5, size =3) + scale_x_log10()+
   xlab("Orbital Period") +
-  ylab("Semi Major Axis")
+  ylab("Planet Mass")
+km.out <- kmeans(kmeanscols, centers = 4, nstart = 20)
+km.out
+planetdata_final$cluster_id <- factor(km.out$cluster)
+ggplot(planetdata_final, aes(x = pl_orbper, y = pl_rade, color = cluster_id, shape = discoverymethod)) +
+  geom_point(alpha = 0.5, size =3) + scale_x_log10()+
+  xlab("Orbital Period") +
+  ylab("Planet Radius")
+km.out <- kmeans(kmeanscols, centers = 4, nstart = 20)
+km.out
+planetdata_final$cluster_id <- factor(km.out$cluster)
+ggplot(planetdata_final, aes(x = pl_orbsmax, y = pl_rade, color = cluster_id, shape = discoverymethod)) +
+  geom_point(alpha = 0.5, size =3) + scale_x_log10()+
+  xlab("Semi Major Axis") +
+  ylab("Planet Radius")
+km.out <- kmeans(kmeanscols, centers = 4, nstart = 20)
+km.out
+planetdata_final$cluster_id <- factor(km.out$cluster)
+ggplot(planetdata_final, aes(x = pl_orbsmax, y = pl_massj, color = cluster_id, shape = discoverymethod)) +
+  geom_point(alpha = 0.5, size =3) + scale_x_log10()+
+  xlab("Semi Major Axis") +
+  ylab("Planet Mass")
 ```
 
 yYou can add options to executable code like this
@@ -71,4 +90,8 @@ yYou can add options to executable code like this
 2 * 2
 ```
 
-The `echo: false` option disables the printing of code (only output is displayed).
+## Results
+
+The five plots above highlight certain biases present in each method of exoplanet detection. The first plot shows a graph between planet mass and orbital period. No alterations are done to this plot except for applying the log scale to both axes'. The latter four plots all have gone through k-means clustering prior. All four share the pattern of the transit method favoring low period and low semi major axis planets. The transit method also favors low mass planets. Transiting planets have a much wider range in planet radius relative to the other detection methods. Imaging, microlensing, and radial velocity all have larger ranges in all categories except for planet radius.
+
+These biases most likely exist due to the processes present in each exoplanet detection method. Transiting involves using the dip in a star's luminosity to detect an orbiting planet. As a result, it would be much easier to detect planets with a small orbital period as the dip in luminosity could be measured much more often. The methods used in radial velocity are independent of orbital period and semi major axis and instead focuses on how a planet shifts a star with its own gravitational pull. As a result, the planets it discovers have more variable parameters.
