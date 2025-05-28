@@ -1,0 +1,33 @@
+---
+title: "Project4"
+format: html
+editor: visual
+---
+
+## Question
+
+Are certain exoplanet characteristics more likely to be observed with different detection methods?
+
+## Data
+
+The data model used would be a normal distribution. The distribution follows Xi \~ N(Xi, sigma i\^2). Assumptions are that the observations are independent and that the measurement errors are normally distributed.
+
+## Estimates
+
+What is being estimated is if and how different detection methods affect the distribution of exoplanet parameters. The response variable would be the exoplanet characteristics, i.e. the radius, mass etc. What would be calculated would be MSE, variance, and mean.
+
+## Methods
+
+Simulations will be used to create data with similar distributions to the data used in Project III. Regression models such as ridge and lasso will also be used.
+
+## Performance Criteria
+
+Metrics that are used include mean, standard deviation, MSE, and how accurate ridge and lasso regression are.
+
+## Simulation Plan
+
+1000 simulations would be ran. Parameters would be means and standard deviations calculated. What would be recorded is simulated feature values. Project III's code uses PCA, so the code would be heavily altered to have it do ridge and lasso regression.
+
+## Challenges or Limitations 
+
+Due to the size of the simulated data, running 1000 simulations may be intensive computationally. High variability within the parameters such as radius may mess up trends.
