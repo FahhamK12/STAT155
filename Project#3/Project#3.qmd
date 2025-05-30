@@ -1,0 +1,85 @@
+---
+title: "Project 3"
+format: html
+editor: visual
+---
+
+## Introduction and Data
+
+The research question asks if the method of exoplanet discovery is correlated with the parameters present in the current exoplanet population.
+
+```{r}
+install.packages("ggplot2")
+install.packages("tidyr")
+install.packages("dplyr")
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+filtered_data <- planetdata_cleaner %>%
+  filter(discoverymethod %in% c("Transit", "Radial Velocity")) %>% # use these two because they encompass the majority of the data points
+  select(pl_name, discoverymethod, pl_orbper, pl_massj, pl_orbsmax) %>% #filters the data so only these columns are present
+  filter(!is.na(pl_orbper)) 
+ggplot(filtered_data, aes(x = pl_orbper, fill = discoverymethod)) +
+  geom_density(alpha = 0.5) +
+  scale_x_log10() +   
+  labs(title = "Orbital Period Distribution by Discovery Method",
+       x = "Orbital Period (days, log scale)",
+       y = "Density",
+       fill = "Discovery Method") +
+  theme_minimal() #plots a density map of orbital period vs. the filtered discovery methods
+```
+
+## Methodology
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(datadictionary)
+install.packages("corrr")
+library('corrr')
+install.packages("FactoMineR")
+library('FactoMineR')
+url <- "https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=select+*+from+pscomppars&format=csv"
+planetdata <- read.csv(url) 
+glimpse(planetdata) 
+create_dictionary(planetdata)
+planetdata_edit <- select(planetdata, "discoverymethod", "pl_orbper", "pl_orbsmax", "pl_massj", "pl_eqt", "pl_orbeccen", "pl_rade", "st_teff", "st_rad", "st_mass") 
+planetdata_cleaner <- na.omit(planetdata_edit)
+planetdata_cleaner$discoverymethod[planetdata_cleaner$discoverymethod != "Transit"] <- "Non-Transit"
+exclude_cols <- c("discoverymethod")
+scale_cols <- setdiff(names(planetdata_cleaner), exclude_cols)
+planetdata_scaled <- scale(planetdata_cleaner[scale_cols])
+planetdata_pca <- princomp(planetdata_scaled, cor = TRUE)
+summary(planetdata_pca)
+orbital_par <- c("pl_orbper", "pl_orbsmax", "pl_orbeccen")
+planet_par <- c("pl_massj", "pl_rade", "pl_eqt")
+star_par <- c("st_teff", "st_rad", "st_mass")
+pca_orbit <- princomp(planetdata_scaled[,orbital_par], cor = TRUE)
+pca_planet <- princomp(planetdata_scaled[,planet_par], cor = TRUE)
+pca_star <- princomp(planetdata_scaled[,star_par], cor = TRUE)
+summary(pca_orbit)
+summary(pca_planet)
+summary(pca_star)
+planetdata_cleaner$stellar_PC1 <- pca_star$scores[, 1]
+planetdata_cleaner$planetary_PC1 <- pca_planet$scores[, 1]
+planetdata_cleaner$orbital_PC1 <- pca_orbit$scores[, 1]
+ggplot(planetdata_cleaner, aes(x = discoverymethod, y = stellar_PC1)) +
+  geom_boxplot(fill = "blue") +
+  labs(title = "Stellar PC1 by Discovery Method", x = "Discovery Method", y = "Stellar PC1") +
+  theme_minimal()
+ggplot(planetdata_cleaner, aes(x = discoverymethod, y = orbital_PC1)) +
+  geom_boxplot(fill = "green") +
+  labs(title = "Orbital PC1 by Discovery Method", x = "Discovery Method", y = "Orbital PC1")
+ggplot(planetdata_cleaner, aes(x = discoverymethod, y = planetary_PC1)) +
+  geom_boxplot(fill = "red") +
+  labs(title = "Planetary PC1 by Discovery Method", x = "Discovery Method", y = "Planetary PC1")
+```
+
+You can add options to executable code like this
+
+```{r}
+#| echo: false
+2 * 2
+```
+
+## Results
