@@ -8,26 +8,7 @@ editor: visual
 
 The research question asks if the method of exoplanet discovery is correlated with the parameters present in the current exoplanet population.
 
-```{r}
-install.packages("ggplot2")
-install.packages("tidyr")
-install.packages("dplyr")
-library(dplyr)
-library(ggplot2)
-library(tidyr)
-filtered_data <- planetdata_cleaner %>%
-  filter(discoverymethod %in% c("Transit", "Radial Velocity")) %>% # use these two because they encompass the majority of the data points
-  select(pl_name, discoverymethod, pl_orbper, pl_massj, pl_orbsmax) %>% #filters the data so only these columns are present
-  filter(!is.na(pl_orbper)) 
-ggplot(filtered_data, aes(x = pl_orbper, fill = discoverymethod)) +
-  geom_density(alpha = 0.5) +
-  scale_x_log10() +   
-  labs(title = "Orbital Period Distribution by Discovery Method",
-       x = "Orbital Period (days, log scale)",
-       y = "Density",
-       fill = "Discovery Method") +
-  theme_minimal() #plots a density map of orbital period vs. the filtered discovery methods
-```
+
 
 ## Methodology
 
