@@ -6,7 +6,7 @@ editor: visual
 
 ## Statement
 
-The research question asks if the method of exoplanet discovery is correlated with the parameters present in the current exoplanet population. The method used to answer this question will mainly be clustering. From the dataset, the majority of the variables were removed such as discovery date were removed as they were not relevant to the project. What was left was the name, discovery method, radius, and exoplanet parameters.
+The research question asks if the method of exoplanet discovery is correlated with the parameters present in the current exoplanet population. The method used to answer this question will mainly be clustering. From the dataset, the majority of the variables were removed, such as discovery date were removed as they were not relevant to the project. What was left was the name, discovery method, radius, and exoplanet parameters.
 
 ## Description
 
