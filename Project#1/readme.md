@@ -7,10 +7,12 @@ Data Dictionary: Dimensions: 67 Variables, 5869 observations
 | hostname        | Host star name                      |
 | discoverymethod | Method used to detect the exoplanet |
 | pl_orbper       | Orbital period (days)               |
+| pl_orbeccen     | Eccentricity                        |
+| pl_orbsmax      | Semi-major axis (AU)                |
+| pl_massj        | Planet mass (Jupiter masses)        |
 | pl_rade         | Planet radius (Earth radii)         |
-| pl_bmasse       | Planet mass (Earth masses)          |
+| pl_eqt          | Effective Temperature (K)           |
+| st_rad          | Steller Radius (Solar Radii)        |
 | st_teff         | Stellar effective temperature (K)   |
 | st_mass         | Stellar mass (Solar masses)         |
-| pl_orbsmax      | Semi-major axis (AU)                |
-| disc_year       | Year of discovery                   |
 
