@@ -24,8 +24,8 @@ planetdata <- read.csv(url)
 glimpse(planetdata) #shows every column
 planetdata_edit <- select(planetdata, "pl_name", "hostname", "discoverymethod", "pl_orbper", "pl_orbsmax", "pl_massj", "pl_eqt", "pl_orbeccen", "pl_rade") #selects the few columns that will be used in the final project
 planetdata_cleaner <- na.omit(planetdata_edit) #gets rid of any NA values    
-summary(planetdata_cleaned$discoverymethod) #filters the data so only the discovery method is present
-ggplot(planetdata_cleaned, aes(x=discoverymethod))+geom_bar()+theme(axis.text = element_text(size=3)) #makes a graph comparing how often a discovery method is used
+summary(planetdata_cleaner$discoverymethod) #filters the data so only the discovery method is present
+ggplot(planetdata_cleaner, aes(x=discoverymethod))+geom_bar()+theme(axis.text = element_text(size=3)) #makes a graph comparing how often a discovery method is used
 ```
 
 The visualization above shows the distribution of which discovery methods are more prevalent. As shown, transit and radial velocity make up the vast majority of exoplanet discoveries.
@@ -34,7 +34,15 @@ Bivariate Analysis
 
 ```{r}
 library(ggplot2)
-ggplot(planetdata_final, aes(pl_orbper, pl_orbsmax, color = discoverymethod, shape = discoverymethod)) + geom_point(alpha = 2, size =1.5) + scale_x_log10() + scale_y_log10() + xlab("Orbital Period") + ylab("Semi Major Axis")
+library(dplyr)
+library(datadictionary)
+url <- "https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=select+*+from+pscomppars&format=csv"
+planetdata <- read.csv(url) 
+glimpse(planetdata) 
+create_dictionary(planetdata)
+planetdata_edit <- select(planetdata, "discoverymethod", "pl_orbper", "pl_orbsmax", "pl_massj", "pl_eqt", "pl_orbeccen", "pl_rade", "st_teff", "st_rad", "st_mass") 
+planetdata_cleaner <- na.omit(planetdata_edit)
+ggplot(planetdata_cleaner, aes(pl_orbper, pl_orbsmax, color = discoverymethod, shape = discoverymethod)) + geom_point(alpha = 2, size =1.5) + scale_x_log10() + scale_y_log10() + xlab("Orbital Period") + ylab("Semi Major Axis")
 ```
 
 The above visualization shows the relation between orbital period and semi major axis. Both are rendered onto a log scale to make the data more digestible. How the exoplanet was discovered was also put on the visualization to provide more context.
@@ -48,9 +56,16 @@ install.packages("dplyr")
 library(dplyr)
 library(ggplot2)
 library(tidyr)
+library(datadictionary)
+url <- "https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=select+*+from+pscomppars&format=csv"
+planetdata <- read.csv(url) 
+glimpse(planetdata) 
+create_dictionary(planetdata)
+planetdata_edit <- select(planetdata, "discoverymethod", "pl_orbper", "pl_orbsmax", "pl_massj", "pl_eqt", "pl_orbeccen", "pl_rade", "st_teff", "st_rad", "st_mass") 
+planetdata_cleaner <- na.omit(planetdata_edit)
 filtered_data <- planetdata_cleaner %>%
   filter(discoverymethod %in% c("Transit", "Radial Velocity")) %>% # use these two because they encompass the majority of the data points
-  select(pl_name, discoverymethod, pl_orbper, pl_massj, pl_orbsmax) %>% #filters the data so only these columns are present
+  select(discoverymethod, pl_orbper, pl_massj, pl_orbsmax) %>% #filters the data so only these columns are present
   filter(!is.na(pl_orbper)) 
 ggplot(filtered_data, aes(x = pl_orbper, fill = discoverymethod)) +
   geom_density(alpha = 0.5) +
@@ -78,4 +93,4 @@ ggplot(filtered_data, aes(x = pl_orbsmax, fill = discoverymethod)) +
   theme_minimal() #same as above but for semi major axis
 ```
 
-The above visualization shows a density graph of the orbital period comparing the radial velocity and transit. The graph shows that both have a peak around 25 days, suggesting that the exoplanet discovery methods favor a certain range of orbital periods. It should be noted that radial velocity has a larger range of days while transit's range is more focused.
+The above visualization shows a density graph of the orbital period comparing the radial velocity and transit. The graph shows that both have a peak around 25 days, suggesting that the exoplanet discovery methods favor a certain range of orbital periods. It should be noted that radial velocity has a larger range of days while transit's range is more focused. The other two graphs use the same density method but compare different parameters, being orbital mass and semi-major axis.
