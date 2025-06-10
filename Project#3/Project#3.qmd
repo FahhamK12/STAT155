@@ -6,11 +6,55 @@ editor: visual
 
 ## Introduction and Data
 
-The research question asks if the method of exoplanet discovery is correlated with the parameters present in the current exoplanet population.
+The research question asks if the method of exoplanet discovery is correlated with the parameters present in the current exoplanet population. My motivation for this project comes from my interest in the subject as well as a way to learn how machine learning and astronomy are intertwined. The exoplanet parameters that will be tested will be the planetary and stellar equilibrium temperature, orbital period, planetary and stellar mass, planetary and stellar radius, orbital eccentricity, and orbital semi-major axis.
 
-
+```{r}
+install.packages("ggplot2")
+install.packages("tidyr")
+install.packages("dplyr")
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(datadictionary)
+url <- "https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=select+*+from+pscomppars&format=csv"
+planetdata <- read.csv(url) 
+glimpse(planetdata) 
+create_dictionary(planetdata)
+planetdata_edit <- select(planetdata, "discoverymethod", "pl_orbper", "pl_orbsmax", "pl_massj", "pl_eqt", "pl_orbeccen", "pl_rade", "st_teff", "st_rad", "st_mass") 
+planetdata_cleaner <- na.omit(planetdata_edit)
+filtered_data <- planetdata_cleaner %>%
+  filter(discoverymethod %in% c("Transit", "Radial Velocity")) %>% # use these two because they encompass the majority of the data points
+  select(discoverymethod, pl_orbper, pl_massj, pl_orbsmax, pl_eqt) %>% #filters the data so only these columns are present
+  filter(!is.na(pl_orbper)) 
+ggplot(filtered_data, aes(x = pl_orbper, fill = discoverymethod)) +
+  geom_density(alpha = 0.5) +
+  scale_x_log10() +   
+  labs(title = "Orbital Period Distribution by Discovery Method",
+       x = "Orbital Period (days, log scale)",
+       y = "Density",
+       fill = "Discovery Method") +
+  theme_minimal() #plots a density map of orbital period vs. the filtered discovery methods
+ggplot(filtered_data, aes(x = pl_massj, fill = discoverymethod)) +
+  geom_density(alpha = 0.5) +
+  scale_x_log10() +
+  labs(title = "Planet Mass Distribution by Discovery Method",
+       x = "Planet Mass (Jupiter Mass, log scale)",
+       y = "Density",
+       fill = "Discovery Method") +
+  theme_minimal() #same as above but for mass
+ggplot(filtered_data, aes(x = pl_eqt, fill = discoverymethod)) +
+  geom_density(alpha = 0.5) +
+  scale_x_log10() +
+  labs(title = "Planet Equilibrium Temperature Distribution by Discovery Method",
+       x = "Equilibrium Temperature (Kelvin)",
+       y = "Density",
+       fill = "Discovery Method") +
+  theme_minimal() #same as above but for semi major axis
+```
 
 ## Methodology
+
+Principal Component Analysis is the main method used in this project. Within the project, each of the variables are group into three parameters, orbital, stellar and planetary. Each parameter is then ran through PCA. The discovery methods used are transit and non-transit with every discovery methods being changed to the latter. The final answer to the research question can be found through analyzing the plots shown.
 
 ```{r}
 library(ggplot2)
@@ -46,21 +90,18 @@ planetdata_cleaner$planetary_PC1 <- pca_planet$scores[, 1]
 planetdata_cleaner$orbital_PC1 <- pca_orbit$scores[, 1]
 ggplot(planetdata_cleaner, aes(x = discoverymethod, y = stellar_PC1)) +
   geom_boxplot(fill = "blue") +
-  labs(title = "Stellar PC1 by Discovery Method", x = "Discovery Method", y = "Stellar PC1") +
+  labs(title = "Stellar PCA by Discovery Method", x = "Discovery Method", y = "Stellar PCA") +
   theme_minimal()
 ggplot(planetdata_cleaner, aes(x = discoverymethod, y = orbital_PC1)) +
   geom_boxplot(fill = "green") +
-  labs(title = "Orbital PC1 by Discovery Method", x = "Discovery Method", y = "Orbital PC1")
+  labs(title = "Orbital PCA by Discovery Method", x = "Discovery Method", y = "Orbital PCA")
 ggplot(planetdata_cleaner, aes(x = discoverymethod, y = planetary_PC1)) +
   geom_boxplot(fill = "red") +
-  labs(title = "Planetary PC1 by Discovery Method", x = "Discovery Method", y = "Planetary PC1")
-```
-
-You can add options to executable code like this
-
-```{r}
-#| echo: false
-2 * 2
+  labs(title = "Planetary PCA by Discovery Method", x = "Discovery Method", y = "Planetary PCA")
 ```
 
 ## Results
+
+The three visualizations above provide the answer to our research question. In reference to the stellar parameters, the medians of both the Transit and Non-Transit groups are very similar, suggesting that the method of discovery does not strongly correlate with overall differences in stellar characteristics. However, the Transit group shows more outliers, which may reflect the larger sample size. In reference to the orbital parameters, the interquartile range for the Transit group is much smaller, suggesting that Transit methods tend to detect planets with similar orbital parameters. In contrast, the Non-Transit group has a wider interquartile range and more outliers, indicating greater variability in orbital parameters.
+
+Not all exoplanet parameters exhibit a strong correlation with the method of discovery. Orbital characteristics—such as semi-major axis and orbital period—show a more pronounced distinction, with Non-Transit methods detecting exoplanets across a broader range of orbital configurations. In contrast, stellar and planetary parameters display weaker or minimal association with the discovery method. This is reflected in the similar distributions of their respective PCA scores across Transit and Non-Transit groups, suggesting that factors like host star properties and planetary size or mass are less influenced by the detection technique.
