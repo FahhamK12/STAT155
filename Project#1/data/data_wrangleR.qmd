@@ -1,0 +1,17 @@
+---
+title: "data_wrangleR"
+format: html
+editor: visual
+---
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(datadictionary)
+url <- "https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=select+*+from+pscomppars&format=csv"
+planetdata <- read.csv(url) 
+glimpse(planetdata) 
+create_dictionary(planetdata)
+planetdata_edit <- select(planetdata, "discoverymethod", "pl_orbper", "pl_orbsmax", "pl_massj", "pl_eqt", "pl_orbeccen", "pl_rade", "st_teff", "st_rad", "st_mass") 
+planetdata_cleaner <- na.omit(planetdata_edit)
+```
