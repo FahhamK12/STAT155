@@ -1,4 +1,6 @@
-Data: NASA's exoplanet archive, which has data on every exoplanet that has been discovered. Extracted from: https://exoplanetarchive.ipac.caltech.edu/cgi-bin/TblView/nph-tblView?app=ExoTbls&config=PS 
+Data: NASA's exoplanet archive, which has data on every exoplanet that has been discovered. Extracted from: https://exoplanetarchive.ipac.caltech.edu/cgi-bin/TblView/nph-tblView?app=ExoTbls&config=PS. 
+
+Data Cleaning: Through the link https://exoplanetarchive.ipac.caltech.edu/cgi-bin/TblView/nph-tblView?app=ExoTbls&config=PS, you can extract a csv version of the data presented. After being extracted, the data was filtered so that the majority of columns were removed, leaving only the columns shown below in the data dictionary. 
 
 Data Dictionary: Dimensions: 67 Variables, 5869 observations
 | Variable        | Description                         |
