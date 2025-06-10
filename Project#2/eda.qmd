@@ -6,11 +6,11 @@ editor: visual
 
 ## Statement
 
-The research question asks if the method of exoplanet discovery is correlated with the parameters present in the current exoplanet population. The method used to answer this question will mainly be clustering. From the dataset, the majority of the variables were removed, such as discovery date were removed as they were not relevant to the project. What was left was the name, discovery method, radius, and exoplanet parameters.
+The research question asks if the method of exoplanet discovery is correlated with the parameters present in the current exoplanet population. The method used to answer this question will mainly be clustering. From the dataset, the majority of the variables were removed such as discovery date were removed as they were not relevant to the project. What was left was the name, discovery method, radius, and exoplanet parameters.
 
 ## Description
 
-The exoplanet parameters that will be tested will be the equilibrium temperature, orbital period, mass, orbital eccentricity, and orbital semi-major axis. These are the main variables that determine what type of planet the exoplanet is, i.e. gas giant. The discovery method is also a key part of this project. The different discovery methods are Astrometry, Eclipse Timing Variations, Imaging, Microlensing, and Transit. These different methods will each be correlated with different exoplanet variables. Through this, we can see if certain discovery methods favor certain parameters in exoplanets.
+The exoplanet parameters that will be tested will be the planetary and stellar equilibrium temperature, orbital period, planetary and stellar mass, planetary and stellar radius, orbital eccentricity, and orbital semi-major axis. The discovery method is also a key part of this project. The different discovery methods are Astrometry, Eclipse Timing Variations, Imaging, Microlensing, and Transit. These different methods will each be correlated with different exoplanet variables. Through this, we can see if certain discovery methods favor certain parameters in exoplanets.
 
 ## EDA
 
@@ -25,7 +25,7 @@ glimpse(planetdata) #shows every column
 planetdata_edit <- select(planetdata, "pl_name", "hostname", "discoverymethod", "pl_orbper", "pl_orbsmax", "pl_massj", "pl_eqt", "pl_orbeccen", "pl_rade") #selects the few columns that will be used in the final project
 planetdata_cleaner <- na.omit(planetdata_edit) #gets rid of any NA values    
 summary(planetdata_cleaner$discoverymethod) #filters the data so only the discovery method is present
-ggplot(planetdata_cleaner, aes(x=discoverymethod))+geom_bar()+theme(axis.text = element_text(size=3)) #makes a graph comparing how often a discovery method is used
+ggplot(planetdata_cleaner, aes(x=discoverymethod))+geom_bar()+theme(axis.text = element_text(size=6.5)) #makes a graph comparing how often a discovery method is used
 ```
 
 The visualization above shows the distribution of which discovery methods are more prevalent. As shown, transit and radial velocity make up the vast majority of exoplanet discoveries.
@@ -45,7 +45,7 @@ planetdata_cleaner <- na.omit(planetdata_edit)
 ggplot(planetdata_cleaner, aes(pl_orbper, pl_orbsmax, color = discoverymethod, shape = discoverymethod)) + geom_point(alpha = 2, size =1.5) + scale_x_log10() + scale_y_log10() + xlab("Orbital Period") + ylab("Semi Major Axis")
 ```
 
-The above visualization shows the relation between orbital period and semi major axis. Both are rendered onto a log scale to make the data more digestible. How the exoplanet was discovered was also put on the visualization to provide more context.
+The above visualization shows the relation between orbital period and semi major axis. Both are rendered onto a log scale to make the data more digestible. How the exoplanet was discovered was also put on the visualization to provide more context. As shown above, transit occupies the lower to middle ends of semi-major axes and orbital periods while the other methods are more spread out.
 
 Multivariate Analysis
 
@@ -65,7 +65,7 @@ planetdata_edit <- select(planetdata, "discoverymethod", "pl_orbper", "pl_orbsma
 planetdata_cleaner <- na.omit(planetdata_edit)
 filtered_data <- planetdata_cleaner %>%
   filter(discoverymethod %in% c("Transit", "Radial Velocity")) %>% # use these two because they encompass the majority of the data points
-  select(discoverymethod, pl_orbper, pl_massj, pl_orbsmax) %>% #filters the data so only these columns are present
+  select(discoverymethod, pl_orbper, pl_massj, pl_orbsmax, pl_eqt) %>% #filters the data so only these columns are present
   filter(!is.na(pl_orbper)) 
 ggplot(filtered_data, aes(x = pl_orbper, fill = discoverymethod)) +
   geom_density(alpha = 0.5) +
@@ -78,19 +78,19 @@ ggplot(filtered_data, aes(x = pl_orbper, fill = discoverymethod)) +
 ggplot(filtered_data, aes(x = pl_massj, fill = discoverymethod)) +
   geom_density(alpha = 0.5) +
   scale_x_log10() +
-  labs(title = "Orbital Mass Distribution by Discovery Method",
-       x = "Orbital Mass (Jupiter Mass, log scale)",
+  labs(title = "Planet Mass Distribution by Discovery Method",
+       x = "Planet Mass (Jupiter Mass, log scale)",
        y = "Density",
        fill = "Discovery Method") +
   theme_minimal() #same as above but for mass
-ggplot(filtered_data, aes(x = pl_orbsmax, fill = discoverymethod)) +
+ggplot(filtered_data, aes(x = pl_eqt, fill = discoverymethod)) +
   geom_density(alpha = 0.5) +
   scale_x_log10() +
-  labs(title = "Semi Major Axis Distribution by Discovery Method",
-       x = "Semi Major Axis  (AU, log scale)",
+  labs(title = "Planet Equilibrium Temperature Distribution by Discovery Method",
+       x = "Equilibrium Temperature (Kelvin)",
        y = "Density",
        fill = "Discovery Method") +
   theme_minimal() #same as above but for semi major axis
 ```
 
-The above visualization shows a density graph of the orbital period comparing the radial velocity and transit. The graph shows that both have a peak around 25 days, suggesting that the exoplanet discovery methods favor a certain range of orbital periods. It should be noted that radial velocity has a larger range of days while transit's range is more focused. The other two graphs use the same density method but compare different parameters, being orbital mass and semi-major axis.
+The above visualizations shows a density graph of the orbital period, planet mass, and equilibrium temperature comparing the radial velocity and transit. For orbital period, transit occupies the low end while radial velocity has a wider range. For planet mass, both transit and radial velocity share a similar density path. For equilibrium temperature, radial velocity detects planets with a lower equilibrium temperature while transit detects planets with a higher equilibrium temperature.
